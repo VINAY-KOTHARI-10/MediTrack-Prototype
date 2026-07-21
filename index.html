@@ -57,6 +57,9 @@
             overflow: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         ::-webkit-scrollbar {
             width: 3px;
@@ -68,27 +71,97 @@
             background: var(--primary-soft);
             border-radius: 10px;
         }
-        .phone-frame {
-            max-width: 420px;
+
+        /* ── iPhone Frame ── */
+        .iphone-frame {
             width: 100%;
+            max-width: 390px;
             height: 100vh;
             height: 100dvh;
-            margin: 0 auto;
+            max-height: 844px;
+            background: #000;
+            border-radius: 44px;
+            padding: 12px;
+            box-shadow: 0 0 0 2px #1a1a1a, 0 0 0 4px #333, 0 20px 80px rgba(0, 0, 0, 0.5);
             position: relative;
+            flex-shrink: 0;
+        }
+        /* Dynamic Island */
+        .iphone-frame::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 34px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 200;
+            pointer-events: none;
+        }
+        /* Speaker grille */
+        .iphone-frame::after {
+            content: '';
+            position: absolute;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            z-index: 201;
+            pointer-events: none;
+        }
+        /* Home indicator */
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            z-index: 200;
+            pointer-events: none;
+        }
+        /* Screen inside frame */
+        .phone-frame {
+            width: 100%;
+            height: 100%;
+            border-radius: 36px;
             overflow: hidden;
             background: var(--bg);
             box-shadow: 0 0 60px rgba(27, 94, 32, 0.04);
+            position: relative;
         }
-        @media (min-width: 440px) {
+        /* Remove outer frame shadow when inside iPhone */
+        .phone-frame .app-container {
+            border-radius: 0;
+            height: 100%;
+        }
+
+        @media (max-width: 440px) {
+            .iphone-frame {
+                border-radius: 0;
+                padding: 0;
+                max-height: 100vh;
+                max-width: 100%;
+                box-shadow: none;
+            }
+            .iphone-frame::before,
+            .iphone-frame::after,
+            .home-indicator {
+                display: none;
+            }
             .phone-frame {
-                border-radius: 36px;
-                border: 1px solid rgba(46, 125, 50, 0.06);
-                height: 92vh;
-                max-height: 860px;
-                margin-top: 4vh;
-                box-shadow: var(--shadow-lg);
+                border-radius: 0;
             }
         }
+
+        /* ── App Container ── */
         .app-container {
             display: flex;
             flex-direction: column;
@@ -96,6 +169,7 @@
             width: 100%;
             position: relative;
             overflow: hidden;
+            background: var(--bg);
         }
         .status-bar {
             height: 44px;
@@ -577,11 +651,11 @@
             min-width: 0;
         }
         .otp-row .otp-container input {
-    width: 0;
-    flex: 1;
-    min-width: 0;
-    padding: 0;
-}
+            width: 0;
+            flex: 1;
+            min-width: 0;
+            padding: 0;
+        }
         .otp-row .send-btn {
             width: auto;
             padding: 14px 20px;
@@ -2909,613 +2983,616 @@
 </head>
 <body>
 
-    <div class="phone-frame" id="app">
-        <div class="app-container">
+    <div class="iphone-frame">
+        <div class="home-indicator"></div>
+        <div class="phone-frame" id="app">
+            <div class="app-container">
 
-            <!-- ═══ SPLASH ═══ -->
-            <div class="splash-screen" id="splashScreen">
-                <div class="splash-logo">Medi<span>Track</span></div>
-                <div class="splash-sub">Smart Hospital Bed Management</div>
-                <div class="splash-loader"></div>
-                <div class="splash-med">Bed Slot Booking · Bed Management</div>
-            </div>
-
-            <!-- ═══ STATUS BAR ═══ -->
-            <div class="status-bar" id="statusBar">
-                <span class="time">12:01</span>
-                <div class="status-icons">
-                    <i class="fas fa-signal"></i>
-                    <i class="fas fa-wifi"></i>
-                    <i class="fas fa-battery-three-quarters"></i>
+                <!-- ═══ SPLASH ═══ -->
+                <div class="splash-screen" id="splashScreen">
+                    <div class="splash-logo">Medi<span>Track</span></div>
+                    <div class="splash-sub">Smart Hospital Bed Management</div>
+                    <div class="splash-loader"></div>
+                    <div class="splash-med">Bed Slot Booking · Bed Management</div>
                 </div>
-            </div>
 
-            <!-- ═══ HEADER ═══ -->
-            <div class="app-header" id="appHeader">
-                <button class="back-btn" id="backBtn" style="visibility:hidden;">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <span class="header-title" id="headerTitle">Medi<span>Track</span></span>
-                <button class="header-action" id="headerActionBtn">
-                    <i class="fas fa-bell" id="headerActionIcon"></i>
-                    <span class="badge-dot" id="actionBadge"></span>
-                </button>
-            </div>
-
-            <!-- ═══ SCREENS ═══ -->
-            <div class="screen-container">
-
-                <!-- ── LANDING ── -->
-                <div class="screen active" id="screen-landing">
-                    <div class="landing-hero">
-                        <div class="badge"><i class="fas fa-bed"></i> Find a Bed, Save a Life</div>
-                        <h1>Smart Hospital<br /><span>Bed Management</span></h1>
-                        <div class="tagline">Intelligent management, AI severity detection &amp; inter-hospital transfers</div>
-                        <div class="landing-stats">
-                            <div class="stat-card"><div class="num">7+</div><div class="label">Hospitals</div></div>
-                            <div class="stat-card"><div class="num">150+</div><div class="label">Beds Tracked</div></div>
-                            <div class="stat-card"><div class="num">24/7</div><div class="label">Availability</div></div>
-                        </div>
-                        <div class="landing-actions">
-                            <button class="btn-primary" onclick="navigateTo('login')"><i class="fas fa-sign-in-alt"></i> Login</button>
-                            <button class="btn-secondary" onclick="navigateTo('register')"><i class="fas fa-user-plus"></i> Create Account</button>
-                        </div>
-                        <div class="landing-features">
-                            <div class="feature-chip"><i class="fas fa-bed"></i> Bed Booking</div>
-                            <div class="feature-chip"><i class="fas fa-robot"></i> AI Severity</div>
-                            <div class="feature-chip"><i class="fas fa-clock"></i> Queue System</div>
-                            <div class="feature-chip"><i class="fas fa-shield-alt"></i> Fraud Detection</div>
-                        </div>
+                <!-- ═══ STATUS BAR ═══ -->
+                <div class="status-bar" id="statusBar">
+                    <span class="time">12:01</span>
+                    <div class="status-icons">
+                        <i class="fas fa-signal"></i>
+                        <i class="fas fa-wifi"></i>
+                        <i class="fas fa-battery-three-quarters"></i>
                     </div>
                 </div>
 
-                <!-- ── LOGIN ── -->
-                <div class="screen" id="screen-login">
-                    <div class="login-title">Welcome back <span>🦷</span></div>
-                    <div class="login-sub">Login to access your dashboard</div>
-                    <div class="role-selector">
-                        <button class="role-option active" data-role="patient" onclick="selectRole(this)">Patient</button>
-                        <button class="role-option" data-role="admin" onclick="selectRole(this)">Admin</button>
-                    </div>
-                    <div class="input-group"><label>Email address</label><input type="email" placeholder="you@email.com" /></div>
-                    <div class="input-group"><label>Password</label><input type="password" placeholder="Your password"  /></div>
-                    <button class="btn-primary" onclick="handleLogin()">Login <i class="fas fa-arrow-right"></i></button>
-                    <div class="divider-text">or</div>
-                    <div style="text-align:center;margin:4px 0;">
-                        <button class="btn-ghost" onclick="navigateTo('register')" style="font-size:15px;">No account? Register here</button>
-                    </div>
-                    <button class="oauth-btn mt-8" onclick="handleGoogleLogin()"><i class="fab fa-google"></i> Sign in with Google</button>
+                <!-- ═══ HEADER ═══ -->
+                <div class="app-header" id="appHeader">
+                    <button class="back-btn" id="backBtn" style="visibility:hidden;">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="header-title" id="headerTitle">Medi<span>Track</span></span>
+                    <button class="header-action" id="headerActionBtn">
+                        <i class="fas fa-bell" id="headerActionIcon"></i>
+                        <span class="badge-dot" id="actionBadge"></span>
+                    </button>
                 </div>
 
-                <!-- ── REGISTER ── -->
-                <div class="screen" id="screen-register">
-                    <div class="login-title">Create <span>account</span></div>
-                    <div class="login-sub">3-step verification</div>
-                    <div class="step-indicators">
-                        <div class="step-dot active" data-step="1"></div>
-                        <div class="step-dot" data-step="2"></div>
-                        <div class="step-dot" data-step="3"></div>
-                    </div>
-                    <div class="step-content active" data-step="1">
-                        <div class="input-group"><label>Email</label><input type="email" placeholder="you@example.com" id="regEmail" /></div>
-                        <div class="input-group">
-                            <label>OTP Code</label>
-                            <div class="otp-row">
-                                <div class="otp-container">
-                                    <input type="text" maxlength="1" class="otp-input" />
-                                    <input type="text" maxlength="1" class="otp-input" />
-                                    <input type="text" maxlength="1" class="otp-input" />
-                                    <input type="text" maxlength="1" class="otp-input" />
-                                    <input type="text" maxlength="1" class="otp-input" />
-                                    <input type="text" maxlength="1" class="otp-input" />
-                                </div>
-                                <button class="send-btn" onclick="sendOtp()">Send</button>
+                <!-- ═══ SCREENS ═══ -->
+                <div class="screen-container">
+
+                    <!-- ── LANDING ── -->
+                    <div class="screen active" id="screen-landing">
+                        <div class="landing-hero">
+                            <div class="badge"><i class="fas fa-bed"></i> Booking · Bed Management</div>
+                            <h1>Smart Hospital<br /><span>Bed Management</span></h1>
+                            <div class="tagline">Intelligent queue, AI severity detection &amp; inter-hospital transfers</div>
+                            <div class="landing-stats">
+                                <div class="stat-card"><div class="num">7+</div><div class="label">Hospitals</div></div>
+                                <div class="stat-card"><div class="num">150+</div><div class="label">Beds Tracked</div></div>
+                                <div class="stat-card"><div class="num">24/7</div><div class="label">Availability</div></div>
                             </div>
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">6-digit code valid for 10 minutes</div>
+                            <div class="landing-actions">
+                                <button class="btn-primary" onclick="navigateTo('login')"><i class="fas fa-sign-in-alt"></i> Login</button>
+                                <button class="btn-secondary" onclick="navigateTo('register')"><i class="fas fa-user-plus"></i> Create Account</button>
+                            </div>
+                            <div class="landing-features">
+                                <div class="feature-chip"><i class="fas fa-bed"></i> Bed Booking</div>
+                                <div class="feature-chip"><i class="fas fa-robot"></i> AI Severity</div>
+                                <div class="feature-chip"><i class="fas fa-clock"></i> Queue System</div>
+                                <div class="feature-chip"><i class="fas fa-shield-alt"></i> Fraud Detection</div>
+                            </div>
                         </div>
-                        <button class="btn-primary" onclick="nextStep(2)">Verify &amp; Continue</button>
                     </div>
-                    <div class="step-content" data-step="2">
-                        <div class="input-group"><label>Full Name</label><input type="text" placeholder="Vinay Kothari" /></div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                            <div class="input-group"><label>Phone (10 digits)</label><input type="tel" placeholder="9876543210" /></div>
-                            <div class="input-group"><label>Family Member Number</label><input type="tel" placeholder="9876543210" /></div>
+
+                    <!-- ── LOGIN ── -->
+                    <div class="screen" id="screen-login">
+                        <div class="login-title">Welcome back <span>🦷</span></div>
+                        <div class="login-sub">Login to access your dashboard</div>
+                        <div class="role-selector">
+                            <button class="role-option active" data-role="patient" onclick="selectRole(this)">Patient</button>
+                            <button class="role-option" data-role="admin" onclick="selectRole(this)">Admin</button>
                         </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                            <div class="input-group"><label>DOB</label><input type="date" /></div>
-                            <div class="input-group"><label>Gender</label><select><option>Male</option><option>Female</option><option>Other</option></select></div>
+                        <div class="input-group"><label>Email address</label><input type="email" placeholder="you@email.com" /></div>
+                        <div class="input-group"><label>Password</label><input type="password" placeholder="Your password"  /></div>
+                        <button class="btn-primary" onclick="handleLogin()">Login <i class="fas fa-arrow-right"></i></button>
+                        <div class="divider-text">or</div>
+                        <div style="text-align:center;margin:4px 0;">
+                            <button class="btn-ghost" onclick="navigateTo('register')" style="font-size:15px;">No account? Register here</button>
                         </div>
-                        <div class="input-group"><label>Blood Group</label><select><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
-                        <div class="input-group"><label>Full Address</label><input type="text" placeholder="Main Road, Pune" /></div>
-                        <button class="btn-primary" onclick="nextStep(3)">Continue</button>
+                        <button class="oauth-btn mt-8" onclick="handleGoogleLogin()"><i class="fab fa-google"></i> Sign in with Google</button>
                     </div>
-                    <div class="step-content" data-step="3">
-                        <div class="input-group">
-                            <label>Create Password</label>
-                            <input type="password" placeholder="Min 8 characters" id="regPassword" oninput="checkPasswordStrength(this.value)" />
-                            <div class="password-strength"><div class="bar" id="pwBar1"></div><div class="bar" id="pwBar2"></div><div class="bar" id="pwBar3"></div><div class="bar" id="pwBar4"></div></div>
-                            <div class="password-strength-text" id="pwText">Enter a strong password</div>
+
+                    <!-- ── REGISTER ── -->
+                    <div class="screen" id="screen-register">
+                        <div class="login-title">Create <span>account</span></div>
+                        <div class="login-sub">3-step verification</div>
+                        <div class="step-indicators">
+                            <div class="step-dot active" data-step="1"></div>
+                            <div class="step-dot" data-step="2"></div>
+                            <div class="step-dot" data-step="3"></div>
                         </div>
-                        <div style="text-align:center;padding:8px 0;">
-                            <i class="fas fa-hospital" style="font-size:28px;color:var(--primary-soft);"></i>
-                            <div style="font-size:16px;font-weight:600;margin-top:4px;color:var(--primary);">Hospital Setup (Admin)</div>
-                            <div class="text-secondary" style="font-size:13px;">Configure your hospital details</div>
+                        <div class="step-content active" data-step="1">
+                            <div class="input-group"><label>Email</label><input type="email" placeholder="you@example.com" id="regEmail" /></div>
+                            <div class="input-group">
+                                <label>OTP Code</label>
+                                <div class="otp-row">
+                                    <div class="otp-container">
+                                        <input type="text" maxlength="1" class="otp-input" />
+                                        <input type="text" maxlength="1" class="otp-input" />
+                                        <input type="text" maxlength="1" class="otp-input" />
+                                        <input type="text" maxlength="1" class="otp-input" />
+                                        <input type="text" maxlength="1" class="otp-input" />
+                                        <input type="text" maxlength="1" class="otp-input" />
+                                    </div>
+                                    <button class="send-btn" onclick="sendOtp()">Send</button>
+                                </div>
+                                <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">6-digit code valid for 10 minutes</div>
+                            </div>
+                            <button class="btn-primary" onclick="nextStep(2)">Verify &amp; Continue</button>
                         </div>
-                        <div class="input-group"><label>Hospital Name</label><input type="text" placeholder="City General Hospital" /></div>
-                        <div class="input-group"><label>City</label><input type="text" placeholder="Pune" /></div>
-                        <div class="input-group">
-                            <label>Bed Capacity</label>
+                        <div class="step-content" data-step="2">
+                            <div class="input-group"><label>Full Name</label><input type="text" placeholder="Vinay Kothari" /></div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                                <input type="number" placeholder="ICU" />
-                                <input type="number" placeholder="General" />
-                                <input type="number" placeholder="Emergency" />
-                                <input type="number" placeholder="Maternity" />
+                                <div class="input-group"><label>Phone (10 digits)</label><input type="tel" placeholder="9876543210" /></div>
+                                <div class="input-group"><label>Family Member Number</label><input type="tel" placeholder="9876543210" /></div>
                             </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                <div class="input-group"><label>DOB</label><input type="date" /></div>
+                                <div class="input-group"><label>Gender</label><select><option>Male</option><option>Female</option><option>Other</option></select></div>
+                            </div>
+                            <div class="input-group"><label>Blood Group</label><select><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+                            <div class="input-group"><label>Full Address</label><input type="text" placeholder="Main Road, Pune" /></div>
+                            <button class="btn-primary" onclick="nextStep(3)">Continue</button>
                         </div>
-                        <button class="btn-primary btn-success" onclick="handleRegister()"><i class="fas fa-check"></i> Complete Registration</button>
-                    </div>
-                </div>
-
-                <!-- ── PATIENT: FIND HOSPITALS ── -->
-                <div class="screen" id="screen-hospitals">
-                    <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search hospitals, city..." /></div>
-                    <div class="filter-chips">
-                        <button class="filter-chip active">All</button>
-                        <button class="filter-chip">ICU</button>
-                        <button class="filter-chip">General</button>
-                        <button class="filter-chip">Emergency</button>
-                        <button class="filter-chip">Maternity</button>
-                    </div>
-                    <div id="hospitalList"></div>
-                </div>
-
-                <!-- ── PATIENT: HOSPITAL DETAIL ── -->
-                <div class="screen" id="screen-detail">
-                    <div class="detail-banner">
-                        <div class="d-name" id="detailName">City General Hospital</div>
-                        <div class="d-loc" id="detailLoc">📍 Swargate, Pune</div>
-                        <div class="d-rating"><i class="fas fa-star"></i> 4.8 · 200+ reviews</div>
-                    </div>
-                    <div style="font-size:15px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">Bed Availability</div>
-                    <div class="bed-breakdown" id="detailBeds"></div>
-                    <button class="btn-primary" onclick="navigateTo('booking')"><i class="fas fa-bed"></i> Book a Bed</button>
-                </div>
-
-                <!-- ── PATIENT: BOOK BED ── -->
-                <div class="screen" id="screen-booking">
-                    <div style="font-size:20px;font-weight:700;margin-top:0;color:var(--primary);">Book a Bed</div>
-                    <div class="text-secondary" style="font-size:14px;margin-bottom:14px;">City General Hospital · ICU</div>
-                    <div class="input-group"><label>Select Hospital</label><select><option>City General Hospital</option><option>St. Mary's Medical Center</option><option>Metro Health Hospital</option></select></div>
-                    <div class="input-group"><label>Bed Type</label><select id="bedTypeSelect"><option>ICU</option><option>General</option><option>Emergency</option><option>Maternity</option></select></div>
-                    <div class="input-group"><label>Reason for booking</label><textarea placeholder="Describe the condition or reason..." id="reasonText" oninput="analyzeSeverity(this.value)"></textarea></div>
-                    <div class="input-group"><label>Symptoms (for AI assessment)</label><textarea placeholder="Describe your symptoms in detail..." id="symptomText"></textarea></div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;flex-wrap:wrap;gap:8px;">
-                        <span style="font-weight:600;color:var(--text-secondary);">AI Severity Analysis</span>
-                        <span class="severity-badge high" id="severityBadge"><i class="fas fa-exclamation-triangle"></i> High (8.4)</span>
-                    </div>
-                    <div class="text-muted" style="font-size:12px;margin-bottom:12px;"><i class="fas fa-info-circle"></i> Intelligent severity classification to match patients with appropriate bed types automatically.</div>
-                    <button class="btn-primary" onclick="confirmBooking()"><i class="fas fa-check"></i> Request Booking</button>
-                    <div class="text-muted text-center mt-12" style="font-size:12px;background:var(--primary-glass);padding:10px;border-radius:var(--radius-xs);border:1px solid rgba(46,125,50,0.06);">
-                        <i class="fas fa-shield-alt"></i> Admin must approve your request. You'll receive a notification when confirmed.
-                    </div>
-                </div>
-
-                <!-- ── PATIENT: MY BOOKINGS ── -->
-                <div class="screen" id="screen-bookings">
-                    <div class="page-title">My Bookings</div>
-                    <div class="page-subtitle">Active &amp; past admissions</div>
-                    <div class="glass-card" style="padding:16px;margin-bottom:14px;border-left:4px solid var(--primary);">
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div><div style="font-weight:700;font-size:16px;color:var(--primary);">ICU · City General</div><div class="text-muted" style="font-size:12px;">Booking #B-2026-0717</div></div>
-                            <span class="badge-status active">ACTIVE</span>
-                        </div>
-                        <div class="status-timeline">
-                            <div class="status-step"><div class="dot done"></div><span class="s-label done">Pending</span></div>
-                            <div class="status-step"><div class="dot done"></div><span class="s-label done">Confirmed</span></div>
-                            <div class="status-step"><div class="dot active"></div><span class="s-label active">Admitted</span></div>
-                            <div class="status-step"><div class="dot"></div><span class="s-label">Discharged</span></div>
-                        </div>
-                        <div class="timer-display">
-                            <div class="time" id="countdownTimer">02:59</div>
-                            <div class="label">Admittance timer — confirm within 3 min</div>
-                        </div>
-                        <div style="display:flex;gap:10px;margin-top:8px;">
-                            <button class="btn-secondary" style="flex:1;padding:12px;" onclick="showReceipt('Vinay Kothari','PAT-2026-0717','City General','ICU-03','17 Jul 2026, 09:30','4h 45m')"><i class="fas fa-file-invoice"></i> Receipt</button>
-                            <button class="btn-secondary" style="flex:1;padding:12px;color:var(--danger);border-color:rgba(211,47,47,0.15);" onclick="if(confirm('Cancel this booking?')){alert('Booking cancelled.');}"><i class="fas fa-times"></i> Cancel</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ── PATIENT: QUEUE ── -->
-                <div class="screen" id="screen-queue">
-                    <div class="page-title">Queue</div>
-                    <div class="page-subtitle">City General Hospital · ICU</div>
-                    <div class="glass-card" style="padding:20px;">
-                        <div style="text-align:center;padding:28px 16px;">
-                            <div style="font-size:50px;font-weight:800;color:var(--primary);letter-spacing:-2px;">#3</div>
-                            <div style="font-size:15px;color:var(--text-secondary);margin-top:2px;">Your position in queue</div>
-                            <div style="font-size:17px;font-weight:600;color:var(--primary-soft);margin-top:6px;"><i class="fas fa-hourglass-half"></i> Est. wait: 45 min</div>
-                        </div>
-                        <div style="margin-top:8px;">
-                            <div class="queue-list-item"><span class="name">1. Vinay K.</span><span>ICU · 12 min</span></div>
-                            <div class="queue-list-item"><span class="name">2. Raj P.</span><span>ICU · 28 min</span></div>
-                            <div class="queue-list-item" style="border-bottom-color:var(--primary);"><span class="name highlight"><i class="fas fa-arrow-right"></i> 3. You</span><span class="highlight">Next</span></div>
-                            <div class="queue-list-item"><span class="name">4. Karan J.</span><span>ICU · 52 min</span></div>
-                        </div>
-                    </div>
-                    <div class="mt-16 text-center text-muted" style="font-size:13px;background:var(--primary-glass);padding:10px;border-radius:var(--radius-xs);">
-                        <i class="fas fa-bell"></i> Notifications enabled · you'll be alerted
-                    </div>
-                </div>
-
-                <!-- ── PATIENT: SCORE ── -->
-                <div class="screen" id="screen-history">
-                    <!-- <div class="page-title">Patient Booking Score</div> -->
-                    <div class="score-card">
-                        <div class="score">92<span class="percent">%</span></div>
-                        <div class="label">Booking Reliability Score</div>
-                        <div class="sub">Based on booking history, adherence, and reliability</div>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
-                        <div class="glass-card" style="padding:12px;text-align:center;">
-                            <div style="font-size:20px;font-weight:700;color:var(--primary);">12</div>
-                            <div style="font-size:10px;color:var(--text-muted);">Total Bookings</div>
-                        </div>
-                        <div class="glass-card" style="padding:12px;text-align:center;">
-                            <div style="font-size:20px;font-weight:700;color:var(--primary-soft);">10</div>
-                            <div style="font-size:10px;color:var(--text-muted);">Completed</div>
-                        </div>
-                        <div class="glass-card" style="padding:12px;text-align:center;">
-                            <div style="font-size:20px;font-weight:700;color:var(--warning);">2</div>
-                            <div style="font-size:10px;color:var(--text-muted);">Cancelled</div>
-                        </div>
-                    </div>
-                    <div style="font-size:15px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;">📋 Past Booking History</div>
-                    <div id="historyList"></div>
-                </div>
-
-                <!-- ── PATIENT: PROFILE ── -->
-                <div class="screen" id="screen-profile">
-                    <div class="profile-avatar">JD</div>
-                    <div class="profile-name">Vinay Kothari</div>
-                    <div class="profile-email">vinay@email.com</div>
-                    <div class="profile-id">🆔 PAT-2026-0717</div>
-                    <div class="profile-details">
-                        <div class="profile-detail-item"><div class="lbl">DOB</div><div class="val">15 Mar 1988</div></div>
-                        <div class="profile-detail-item"><div class="lbl">Gender</div><div class="val">Male</div></div>
-                        <div class="profile-detail-item"><div class="lbl">Blood</div><div class="val">A+</div></div>
-                        <div class="profile-detail-item"><div class="lbl">Phone</div><div class="val">+1 234 567 890</div></div>
-                    </div>
-                    <div class="glass-card" style="padding:14px;margin-top:14px;">
-                        <div style="font-weight:600;font-size:14px;color:var(--text-secondary);margin-bottom:6px;">📋 Booking History</div>
-                        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);padding:6px 0;border-bottom:1px solid var(--card-border);">
-                            <span>ICU · City General</span><span class="badge-status active" style="font-size:10px;">Active</span>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);padding:6px 0;border-bottom:1px solid var(--card-border);">
-                            <span>General · St. Mary's</span><span class="badge-status completed" style="font-size:10px;">Completed</span>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);padding:6px 0;">
-                            <span>Emergency · Metro</span><span class="badge-status completed" style="font-size:10px;">Completed</span>
-                        </div>
-                    </div>
-                    <div class="logout-btn-wrap">
-                        <button class="btn-secondary" style="color:var(--danger);border-color:rgba(211,47,47,0.15);" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                    </div>
-                </div>
-
-                <!-- ── ADMIN: DASHBOARD ── -->
-                <div class="screen" id="screen-admin">
-                    <div class="page-title">Dashboard</div>
-                    <div class="page-subtitle">Live bed and booking analytics</div>
-
-                    <div class="admin-nav">
-                        <button class="btn-outline-transfer" onclick="switchAdminTab('transfers')"><i class="fas fa-exchange-alt"></i> Transfers</button>
-                        <button class="btn-outline-fraud" onclick="switchAdminTab('fraud')"><i class="fas fa-robot"></i> Fraud Check</button>
-                    </div>
-
-                    <div class="admin-grid">
-                        <div class="admin-stat"><div class="val">16</div><div class="lbl">Available Beds</div></div>
-                        <div class="admin-stat"><div class="val" style="color:var(--primary);">0</div><div class="lbl">ICU</div></div>
-                        <div class="admin-stat"><div class="val" style="color:var(--warning);">5</div><div class="lbl">Emergency</div></div>
-                        <div class="admin-stat"><div class="val" style="color:var(--primary-soft);">5</div><div class="lbl">General</div></div>
-                    </div>
-
-                    <div class="glass-card pending-approvals-card" style="padding:14px;">
-                        <div style="font-weight:600;font-size:14px;color:var(--text-secondary);margin-bottom:8px;">Pending Approvals</div>
-                        <div id="pendingApprovalsList">
-                            <div class="booking-item" style="margin-top:4px;">
-                                <div class="top"><div><div class="patient">Vinay K.</div><div class="pid">P-ZM0S4QLN</div></div><span class="badge-status pending">Pending</span></div>
-                                <div class="details">General · Fracture · 15 min ago</div>
-                                <div class="note">AI Severity: <strong style="color:var(--warning);">Medium (5.6)</strong></div>
-                                <div class="actions">
-                                    <button class="accept-btn" onclick="acceptBooking(this, 'P-ZM0S4QLN')"><i class="fas fa-check"></i> Accept</button>
-                                    <button class="decline-btn" onclick="declineBooking(this, 'P-ZM0S4QLN')"><i class="fas fa-times"></i> Decline</button>
+                        <div class="step-content" data-step="3">
+                            <div class="input-group">
+                                <label>Create Password</label>
+                                <input type="password" placeholder="Min 8 characters" id="regPassword" oninput="checkPasswordStrength(this.value)" />
+                                <div class="password-strength"><div class="bar" id="pwBar1"></div><div class="bar" id="pwBar2"></div><div class="bar" id="pwBar3"></div><div class="bar" id="pwBar4"></div></div>
+                                <div class="password-strength-text" id="pwText">Enter a strong password</div>
+                            </div>
+                            <div style="text-align:center;padding:8px 0;">
+                                <i class="fas fa-hospital" style="font-size:28px;color:var(--primary-soft);"></i>
+                                <div style="font-size:16px;font-weight:600;margin-top:4px;color:var(--primary);">Hospital Setup (Admin)</div>
+                                <div class="text-secondary" style="font-size:13px;">Configure your hospital details</div>
+                            </div>
+                            <div class="input-group"><label>Hospital Name</label><input type="text" placeholder="City General Hospital" /></div>
+                            <div class="input-group"><label>City</label><input type="text" placeholder="Pune" /></div>
+                            <div class="input-group">
+                                <label>Bed Capacity</label>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                    <input type="number" placeholder="ICU" />
+                                    <input type="number" placeholder="General" />
+                                    <input type="number" placeholder="Emergency" />
+                                    <input type="number" placeholder="Maternity" />
                                 </div>
                             </div>
-                            <div class="booking-item" style="margin-top:4px;">
-                                <div class="top"><div><div class="patient">Vinit Kothari</div><div class="pid">P-OV5E6436</div></div><span class="badge-status pending">Pending</span></div>
-                                <div class="details">ICU · Chest pain · 2 min ago</div>
-                                <div class="note">AI Severity: <strong style="color:var(--danger);">Critical (9.2)</strong></div>
-                                <div class="actions">
-                                    <button class="accept-btn" onclick="acceptBooking(this, 'P-OV5E6436')"><i class="fas fa-check"></i> Accept</button>
-                                    <button class="decline-btn" onclick="declineBooking(this, 'P-OV5E6436')"><i class="fas fa-times"></i> Decline</button>
-                                </div>
+                            <button class="btn-primary btn-success" onclick="handleRegister()"><i class="fas fa-check"></i> Complete Registration</button>
+                        </div>
+                    </div>
+
+                    <!-- ── PATIENT: FIND HOSPITALS ── -->
+                    <div class="screen" id="screen-hospitals">
+                        <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search hospitals, city..." /></div>
+                        <div class="filter-chips">
+                            <button class="filter-chip active">All</button>
+                            <button class="filter-chip">ICU</button>
+                            <button class="filter-chip">General</button>
+                            <button class="filter-chip">Emergency</button>
+                            <button class="filter-chip">Maternity</button>
+                        </div>
+                        <div id="hospitalList"></div>
+                    </div>
+
+                    <!-- ── PATIENT: HOSPITAL DETAIL ── -->
+                    <div class="screen" id="screen-detail">
+                        <div class="detail-banner">
+                            <div class="d-name" id="detailName">City General Hospital</div>
+                            <div class="d-loc" id="detailLoc">📍 Swargate, Pune</div>
+                            <div class="d-rating"><i class="fas fa-star"></i> 4.8 · 200+ reviews</div>
+                        </div>
+                        <div style="font-size:15px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">Bed Availability</div>
+                        <div class="bed-breakdown" id="detailBeds"></div>
+                        <button class="btn-primary" onclick="navigateTo('booking')"><i class="fas fa-bed"></i> Book a Bed</button>
+                    </div>
+
+                    <!-- ── PATIENT: BOOK BED ── -->
+                    <div class="screen" id="screen-booking">
+                        <div style="font-size:20px;font-weight:700;margin-top:0;color:var(--primary);">Book a Bed</div>
+                        <div class="text-secondary" style="font-size:14px;margin-bottom:14px;">City General Hospital · ICU</div>
+                        <div class="input-group"><label>Select Hospital</label><select><option>City General Hospital</option><option>St. Mary's Medical Center</option><option>Metro Health Hospital</option></select></div>
+                        <div class="input-group"><label>Bed Type</label><select id="bedTypeSelect"><option>ICU</option><option>General</option><option>Emergency</option><option>Maternity</option></select></div>
+                        <div class="input-group"><label>Reason for booking</label><textarea placeholder="Describe the condition or reason..." id="reasonText" oninput="analyzeSeverity(this.value)"></textarea></div>
+                        <div class="input-group"><label>Symptoms (for AI assessment)</label><textarea placeholder="Describe your symptoms in detail..." id="symptomText"></textarea></div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;flex-wrap:wrap;gap:8px;">
+                            <span style="font-weight:600;color:var(--text-secondary);">AI Severity Analysis</span>
+                            <span class="severity-badge high" id="severityBadge"><i class="fas fa-exclamation-triangle"></i> High (8.4)</span>
+                        </div>
+                        <div class="text-muted" style="font-size:12px;margin-bottom:12px;"><i class="fas fa-info-circle"></i> Intelligent severity classification to match patients with appropriate bed types automatically.</div>
+                        <button class="btn-primary" onclick="confirmBooking()"><i class="fas fa-check"></i> Request Booking</button>
+                        <div class="text-muted text-center mt-12" style="font-size:12px;background:var(--primary-glass);padding:10px;border-radius:var(--radius-xs);border:1px solid rgba(46,125,50,0.06);">
+                            <i class="fas fa-shield-alt"></i> Admin must approve your request. You'll receive a notification when confirmed.
+                        </div>
+                    </div>
+
+                    <!-- ── PATIENT: MY BOOKINGS ── -->
+                    <div class="screen" id="screen-bookings">
+                        <div class="page-title">My Bookings</div>
+                        <div class="page-subtitle">Active &amp; past admissions</div>
+                        <div class="glass-card" style="padding:16px;margin-bottom:14px;border-left:4px solid var(--primary);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div><div style="font-weight:700;font-size:16px;color:var(--primary);">ICU · City General</div><div class="text-muted" style="font-size:12px;">Booking #B-2026-0717</div></div>
+                                <span class="badge-status active">ACTIVE</span>
+                            </div>
+                            <div class="status-timeline">
+                                <div class="status-step"><div class="dot done"></div><span class="s-label done">Pending</span></div>
+                                <div class="status-step"><div class="dot done"></div><span class="s-label done">Confirmed</span></div>
+                                <div class="status-step"><div class="dot active"></div><span class="s-label active">Admitted</span></div>
+                                <div class="status-step"><div class="dot"></div><span class="s-label">Discharged</span></div>
+                            </div>
+                            <div class="timer-display">
+                                <div class="time" id="countdownTimer">02:59</div>
+                                <div class="label">Admittance timer — confirm within 3 min</div>
+                            </div>
+                            <div style="display:flex;gap:10px;margin-top:8px;">
+                                <button class="btn-secondary" style="flex:1;padding:12px;" onclick="showReceipt('Vinay Kothari','PAT-2026-0717','City General','ICU-03','17 Jul 2026, 09:30','4h 45m')"><i class="fas fa-file-invoice"></i> Receipt</button>
+                                <button class="btn-secondary" style="flex:1;padding:12px;color:var(--danger);border-color:rgba(211,47,47,0.15);" onclick="if(confirm('Cancel this booking?')){alert('Booking cancelled.');}"><i class="fas fa-times"></i> Cancel</button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="glass-card" style="padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:600;font-size:14px;color:var(--text-secondary);">Active Queue</div>
-                        <div class="admin-queue-box" id="activeQueueList">
-                            <div class="queue-list-item"><span class="name">1. Karan J.</span><span>ICU · 12 min wait</span></div>
-                            <div class="queue-list-item"><span class="name">2. Raj P.</span><span>General · 8 min wait</span></div>
-                            <div class="queue-list-item"><span class="name">3. Vinay K.</span><span>Emergency · 5 min wait</span></div>
+                    <!-- ── PATIENT: QUEUE ── -->
+                    <div class="screen" id="screen-queue">
+                        <div class="page-title">Queue</div>
+                        <div class="page-subtitle">City General Hospital · ICU</div>
+                        <div class="glass-card" style="padding:20px;">
+                            <div style="text-align:center;padding:28px 16px;">
+                                <div style="font-size:50px;font-weight:800;color:var(--primary);letter-spacing:-2px;">#3</div>
+                                <div style="font-size:15px;color:var(--text-secondary);margin-top:2px;">Your position in queue</div>
+                                <div style="font-size:17px;font-weight:600;color:var(--primary-soft);margin-top:6px;"><i class="fas fa-hourglass-half"></i> Est. wait: 45 min</div>
+                            </div>
+                            <div style="margin-top:8px;">
+                                <div class="queue-list-item"><span class="name">1. Vinay K.</span><span>ICU · 12 min</span></div>
+                                <div class="queue-list-item"><span class="name">2. Raj P.</span><span>ICU · 28 min</span></div>
+                                <div class="queue-list-item" style="border-bottom-color:var(--primary);"><span class="name highlight"><i class="fas fa-arrow-right"></i> 3. You</span><span class="highlight">Next</span></div>
+                                <div class="queue-list-item"><span class="name">4. Karan J.</span><span>ICU · 52 min</span></div>
+                            </div>
+                        </div>
+                        <div class="mt-16 text-center text-muted" style="font-size:13px;background:var(--primary-glass);padding:10px;border-radius:var(--radius-xs);">
+                            <i class="fas fa-bell"></i> Notifications enabled · you'll be alerted
                         </div>
                     </div>
 
-                    <div class="glass-card" style="padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:600;font-size:14px;color:var(--text-secondary);">Upcoming Appointments</div>
-                        <div id="appointmentList">
-                            <div class="appointment-item"><div class="info"><div class="patient">Vinay Kothari</div><div class="detail">ICU · Dr. Sharma</div></div><div class="time">Today, 3:00 PM</div></div>
-                            <div class="appointment-item"><div class="info"><div class="patient">Vinit Kothari</div><div class="detail">General · Dr. Patel</div></div><div class="time">Tomorrow, 10:30 AM</div></div>
-                            <div class="appointment-item"><div class="info"><div class="patient">Vinay K.</div><div class="detail">Emergency · Dr. Gupta</div></div><div class="time">Jul 20, 9:00 AM</div></div>
+                    <!-- ── PATIENT: SCORE ── -->
+                    <div class="screen" id="screen-history">
+                        <!-- <div class="page-title">Patient Booking Score</div> -->
+                        <div class="score-card">
+                            <div class="score">92<span class="percent">%</span></div>
+                            <div class="label">Booking Reliability Score</div>
+                            <div class="sub">Based on booking history, adherence, and reliability</div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+                            <div class="glass-card" style="padding:12px;text-align:center;">
+                                <div style="font-size:20px;font-weight:700;color:var(--primary);">12</div>
+                                <div style="font-size:10px;color:var(--text-muted);">Total Bookings</div>
+                            </div>
+                            <div class="glass-card" style="padding:12px;text-align:center;">
+                                <div style="font-size:20px;font-weight:700;color:var(--primary-soft);">10</div>
+                                <div style="font-size:10px;color:var(--text-muted);">Completed</div>
+                            </div>
+                            <div class="glass-card" style="padding:12px;text-align:center;">
+                                <div style="font-size:20px;font-weight:700;color:var(--warning);">2</div>
+                                <div style="font-size:10px;color:var(--text-muted);">Cancelled</div>
+                            </div>
+                        </div>
+                        <div style="font-size:15px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;">📋 Past Booking History</div>
+                        <div id="historyList"></div>
+                    </div>
+
+                    <!-- ── PATIENT: PROFILE ── -->
+                    <div class="screen" id="screen-profile">
+                        <div class="profile-avatar">JD</div>
+                        <div class="profile-name">Vinay Kothari</div>
+                        <div class="profile-email">vinay@email.com</div>
+                        <div class="profile-id">🆔 PAT-2026-0717</div>
+                        <div class="profile-details">
+                            <div class="profile-detail-item"><div class="lbl">DOB</div><div class="val">15 Mar 1988</div></div>
+                            <div class="profile-detail-item"><div class="lbl">Gender</div><div class="val">Male</div></div>
+                            <div class="profile-detail-item"><div class="lbl">Blood</div><div class="val">A+</div></div>
+                            <div class="profile-detail-item"><div class="lbl">Phone</div><div class="val">+1 234 567 890</div></div>
+                        </div>
+                        <div class="glass-card" style="padding:14px;margin-top:14px;">
+                            <div style="font-weight:600;font-size:14px;color:var(--text-secondary);margin-bottom:6px;">📋 Booking History</div>
+                            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);padding:6px 0;border-bottom:1px solid var(--card-border);">
+                                <span>ICU · City General</span><span class="badge-status active" style="font-size:10px;">Active</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);padding:6px 0;border-bottom:1px solid var(--card-border);">
+                                <span>General · St. Mary's</span><span class="badge-status completed" style="font-size:10px;">Completed</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);padding:6px 0;">
+                                <span>Emergency · Metro</span><span class="badge-status completed" style="font-size:10px;">Completed</span>
+                            </div>
+                        </div>
+                        <div class="logout-btn-wrap">
+                            <button class="btn-secondary" style="color:var(--danger);border-color:rgba(211,47,47,0.15);" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
                         </div>
                     </div>
-                </div>
 
-                <!-- ── ADMIN: BEDS ── -->
-                <div class="screen" id="screen-admin-beds">
-                    <div class="page-title">Bed Control</div>
-                    <div class="bed-legend">
-                        <span><span class="dot green"></span> Available</span>
-                        <span><span class="dot red"></span> Occupied</span>
-                        <span><span class="dot yellow"></span> Booked</span>
-                        <span><span class="dot pink"></span> Pending</span>
-                        <span><span class="dot purple"></span> Transfer</span>
-                        <span><span class="dot gray"></span> Hidden</span>
-                    </div>
-                    <div class="hidden-toggle" onclick="toggleHiddenBeds()">
-                        <i class="fas fa-eye-slash"></i>
-                        <span>Show Hidden (Reserve) Beds</span>
-                        <div class="toggle-switch" id="hiddenToggle"><div class="knob"></div></div>
-                    </div>
-                    <div id="adminBedGridCategories"></div>
-                    <div class="text-muted" style="font-size:12px;text-align:center;padding:8px 0;">
-                        <i class="fas fa-arrows-alt"></i> Drag a bed to transfer · Click bed for details
+                    <!-- ── ADMIN: DASHBOARD ── -->
+                    <div class="screen" id="screen-admin">
+                        <div class="page-title">Dashboard</div>
+                        <div class="page-subtitle">Live bed and booking analytics</div>
+
+                        <div class="admin-nav">
+                            <button class="btn-outline-transfer" onclick="switchAdminTab('transfers')"><i class="fas fa-exchange-alt"></i> Transfers</button>
+                            <button class="btn-outline-fraud" onclick="switchAdminTab('fraud')"><i class="fas fa-robot"></i> Fraud Check</button>
+                        </div>
+
+                        <div class="admin-grid">
+                            <div class="admin-stat"><div class="val">16</div><div class="lbl">Available Beds</div></div>
+                            <div class="admin-stat"><div class="val" style="color:var(--primary);">0</div><div class="lbl">ICU</div></div>
+                            <div class="admin-stat"><div class="val" style="color:var(--warning);">5</div><div class="lbl">Emergency</div></div>
+                            <div class="admin-stat"><div class="val" style="color:var(--primary-soft);">5</div><div class="lbl">General</div></div>
+                        </div>
+
+                        <div class="glass-card pending-approvals-card" style="padding:14px;">
+                            <div style="font-weight:600;font-size:14px;color:var(--text-secondary);margin-bottom:8px;">Pending Approvals</div>
+                            <div id="pendingApprovalsList">
+                                <div class="booking-item" style="margin-top:4px;">
+                                    <div class="top"><div><div class="patient">Vinay K.</div><div class="pid">P-ZM0S4QLN</div></div><span class="badge-status pending">Pending</span></div>
+                                    <div class="details">General · Fracture · 15 min ago</div>
+                                    <div class="note">AI Severity: <strong style="color:var(--warning);">Medium (5.6)</strong></div>
+                                    <div class="actions">
+                                        <button class="accept-btn" onclick="acceptBooking(this, 'P-ZM0S4QLN')"><i class="fas fa-check"></i> Accept</button>
+                                        <button class="decline-btn" onclick="declineBooking(this, 'P-ZM0S4QLN')"><i class="fas fa-times"></i> Decline</button>
+                                    </div>
+                                </div>
+                                <div class="booking-item" style="margin-top:4px;">
+                                    <div class="top"><div><div class="patient">Vinit Kothari</div><div class="pid">P-OV5E6436</div></div><span class="badge-status pending">Pending</span></div>
+                                    <div class="details">ICU · Chest pain · 2 min ago</div>
+                                    <div class="note">AI Severity: <strong style="color:var(--danger);">Critical (9.2)</strong></div>
+                                    <div class="actions">
+                                        <button class="accept-btn" onclick="acceptBooking(this, 'P-OV5E6436')"><i class="fas fa-check"></i> Accept</button>
+                                        <button class="decline-btn" onclick="declineBooking(this, 'P-OV5E6436')"><i class="fas fa-times"></i> Decline</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card" style="padding:14px;margin-bottom:12px;">
+                            <div style="font-weight:600;font-size:14px;color:var(--text-secondary);">Active Queue</div>
+                            <div class="admin-queue-box" id="activeQueueList">
+                                <div class="queue-list-item"><span class="name">1. Karan J.</span><span>ICU · 12 min wait</span></div>
+                                <div class="queue-list-item"><span class="name">2. Raj P.</span><span>General · 8 min wait</span></div>
+                                <div class="queue-list-item"><span class="name">3. Vinay K.</span><span>Emergency · 5 min wait</span></div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card" style="padding:14px;margin-bottom:12px;">
+                            <div style="font-weight:600;font-size:14px;color:var(--text-secondary);">Upcoming Appointments</div>
+                            <div id="appointmentList">
+                                <div class="appointment-item"><div class="info"><div class="patient">Vinay Kothari</div><div class="detail">ICU · Dr. Sharma</div></div><div class="time">Today, 3:00 PM</div></div>
+                                <div class="appointment-item"><div class="info"><div class="patient">Vinit Kothari</div><div class="detail">General · Dr. Patel</div></div><div class="time">Tomorrow, 10:30 AM</div></div>
+                                <div class="appointment-item"><div class="info"><div class="patient">Vinay K.</div><div class="detail">Emergency · Dr. Gupta</div></div><div class="time">Jul 20, 9:00 AM</div></div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="patient-comm-section">
-                        <div class="section-title"><i class="fas fa-users"></i> Patient &amp; Communication</div>
-                        <div class="admin-search-bar" style="margin:8px 0 12px;">
+                    <!-- ── ADMIN: BEDS ── -->
+                    <div class="screen" id="screen-admin-beds">
+                        <div class="page-title">Bed Control</div>
+                        <div class="bed-legend">
+                            <span><span class="dot green"></span> Available</span>
+                            <span><span class="dot red"></span> Occupied</span>
+                            <span><span class="dot yellow"></span> Booked</span>
+                            <span><span class="dot pink"></span> Pending</span>
+                            <span><span class="dot purple"></span> Transfer</span>
+                            <span><span class="dot gray"></span> Hidden</span>
+                        </div>
+                        <div class="hidden-toggle" onclick="toggleHiddenBeds()">
+                            <i class="fas fa-eye-slash"></i>
+                            <span>Show Hidden (Reserve) Beds</span>
+                            <div class="toggle-switch" id="hiddenToggle"><div class="knob"></div></div>
+                        </div>
+                        <div id="adminBedGridCategories"></div>
+                        <div class="text-muted" style="font-size:12px;text-align:center;padding:8px 0;">
+                            <i class="fas fa-arrows-alt"></i> Drag a bed to transfer · Click bed for details
+                        </div>
+
+                        <div class="patient-comm-section">
+                            <div class="section-title"><i class="fas fa-users"></i> Patient &amp; Communication</div>
+                            <div class="admin-search-bar" style="margin:8px 0 12px;">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Search patients..." id="patientCommSearch" oninput="filterPatientComm(this.value)" />
+                            </div>
+                            <div id="patientCommList">
+                                <div class="comm-item">
+                                    <div class="info"><div class="name">Vinit Kothari</div><div class="pid">P-OV5E6436 · Family: +91 98765 43210</div></div>
+                                    <div class="actions-group">
+                                        <button class="call-btn" onclick="alert('📞 Calling family of Vinit Kothari...')"><i class="fas fa-phone"></i></button>
+                                        <button class="note-btn" onclick="openCommNote('Vinit Kothari')"><i class="fas fa-pen"></i></button>
+                                        <button class="edit-btn" onclick="alert('Edit patient: Vinit Kothari')">Edit</button>
+                                    </div>
+                                </div>
+                                <div class="comm-item">
+                                    <div class="info"><div class="name">Vinay K.</div><div class="pid">P-ZM0S4QLN · Family: +91 87654 32109</div></div>
+                                    <div class="actions-group">
+                                        <button class="call-btn" onclick="alert('📞 Calling family of Vinay K....')"><i class="fas fa-phone"></i></button>
+                                        <button class="note-btn" onclick="openCommNote('Vinay K.')"><i class="fas fa-pen"></i></button>
+                                        <button class="edit-btn" onclick="alert('Edit patient: Vinay K.')">Edit</button>
+                                    </div>
+                                </div>
+                                <div class="comm-item">
+                                    <div class="info"><div class="name">Raj P.</div><div class="pid">P-TDOKEK46 · Family: +91 76543 21098</div></div>
+                                    <div class="actions-group">
+                                        <button class="call-btn" onclick="alert('📞 Calling family of Raj P....')"><i class="fas fa-phone"></i></button>
+                                        <button class="note-btn" onclick="openCommNote('Raj P.')"><i class="fas fa-pen"></i></button>
+                                        <button class="edit-btn" onclick="alert('Edit patient: Raj P.')">Edit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comm-note-area" id="commNoteArea">
+                            <div class="note-header">
+                                <div class="note-label"><i class="fas fa-pen"></i> Send note to <strong id="commNoteTarget">patient</strong> &amp; family</div>
+                                <button class="close-note-btn" onclick="closeCommNote()">&times;</button>
+                            </div>
+                            <div class="note-input-row">
+                                <input type="text" placeholder="Type note for patient and family..." id="commNoteInput" />
+                                <button onclick="sendCommNote()"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── ADMIN: BOOKINGS ── -->
+                    <div class="screen" id="screen-admin-bookings">
+                        <div class="admin-bookings-title">Hospital Bookings</div>
+                        <div class="admin-bookings-subtitle">Manage all patient admissions</div>
+                        <div class="admin-search-bar">
                             <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Search patients..." id="patientCommSearch" oninput="filterPatientComm(this.value)" />
+                            <input type="text" placeholder="Search by patient name or ID..." id="adminBookingSearch" oninput="filterAdminBookings(this.value)" />
                         </div>
-                        <div id="patientCommList">
-                            <div class="comm-item">
-                                <div class="info"><div class="name">Vinit Kothari</div><div class="pid">P-OV5E6436 · Family: +91 98765 43210</div></div>
-                                <div class="actions-group">
-                                    <button class="call-btn" onclick="alert('📞 Calling family of Vinit Kothari...')"><i class="fas fa-phone"></i></button>
-                                    <button class="note-btn" onclick="openCommNote('Vinit Kothari')"><i class="fas fa-pen"></i></button>
-                                    <button class="edit-btn" onclick="alert('Edit patient: Vinit Kothari')">Edit</button>
-                                </div>
+                        <div class="admin-filter-chips">
+                            <button class="filter-chip active" style="font-size:11px;padding:6px 14px;">All</button>
+                            <button class="filter-chip" style="font-size:11px;padding:6px 14px;">Pending</button>
+                            <button class="filter-chip" style="font-size:11px;padding:6px 14px;">Confirmed</button>
+                            <button class="filter-chip" style="font-size:11px;padding:6px 14px;">Admitted</button>
+                            <button class="filter-chip" style="font-size:11px;padding:6px 14px;">Discharged</button>
+                        </div>
+                        <div id="adminBookingList"></div>
+                    </div>
+
+                    <!-- ── ADMIN: TRANSFERS ── -->
+                    <div class="screen" id="screen-admin-transfers">
+                        <div class="page-title">Transfers</div>
+                        <div class="page-subtitle">Internal &amp; external hospital transfers</div>
+                        <div style="font-weight:600;font-size:14px;color:var(--text-secondary);margin-bottom:6px;">Outgoing</div>
+                        <div class="transfer-card">
+                            <div class="from-to">City General <i class="fas fa-arrow-right"></i> St. Mary's</div>
+                            <div class="meta">Patient: Vinit Kothari · ICU · 2 hours ago</div>
+                            <div class="status"><span class="badge-status pending">In Progress</span></div>
+                        </div>
+                        <div style="font-weight:600;font-size:14px;color:var(--text-secondary);margin:12px 0 6px;">Incoming</div>
+                        <div class="transfer-card">
+                            <div class="from-to">Metro <i class="fas fa-arrow-right"></i> City General</div>
+                            <div class="meta">Patient: Vinay K. · Emergency · 5 hours ago</div>
+                            <div class="status"><span class="badge-status completed">Completed</span></div>
+                        </div>
+                        <div class="transfer-card">
+                            <div class="from-to">Apollo <i class="fas fa-arrow-right"></i> City General</div>
+                            <div class="meta">Patient: Raj P. · General · 1 day ago</div>
+                            <div class="status"><span class="badge-status completed">Completed</span></div>
+                        </div>
+                        <button class="btn-secondary mt-12" style="border-color:rgba(46,125,50,0.15);"><i class="fas fa-plus"></i> Request New Transfer</button>
+                    </div>
+
+                    <!-- ── ADMIN: FRAUD ── -->
+                    <div class="screen" id="screen-admin-fraud">
+                        <div class="page-title">AI Fraud Detection</div>
+                        <div class="input-group" style="margin-top:8px;">
+                            <label>Analyze a specific patient by User ID</label>
+                            <input type="text" placeholder="Paste User ID or Patient ID..." />
+                        </div>
+                        <button class="btn-secondary" style="margin-bottom:14px;padding:12px;"><i class="fas fa-search"></i> Analyze</button>
+                        <div style="font-size:14px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">All Patients — Risk Overview</div>
+                        <div id="fraudList"></div>
+                    </div>
+
+                    <!-- ── ADMIN: SETTINGS ── -->
+                    <div class="screen" id="screen-admin-settings">
+                        <div class="page-title">Settings</div>
+                        <div class="settings-group">
+                            <!-- <div class="settings-title">Hospital Information</div> -->
+                            <div class="settings-desc">Update your hospital's public details</div>
+                            <div class="input-group"><label>Hospital Name</label><input type="text" value="Tata Memorial" /></div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                <div class="input-group"><label>City</label><input type="text" value="Pune" /></div>
+                                <div class="input-group"><label>Phone (10 digits)</label><input type="text" value="912345678" /></div>
                             </div>
-                            <div class="comm-item">
-                                <div class="info"><div class="name">Vinay K.</div><div class="pid">P-ZM0S4QLN · Family: +91 87654 32109</div></div>
-                                <div class="actions-group">
-                                    <button class="call-btn" onclick="alert('📞 Calling family of Vinay K....')"><i class="fas fa-phone"></i></button>
-                                    <button class="note-btn" onclick="openCommNote('Vinay K.')"><i class="fas fa-pen"></i></button>
-                                    <button class="edit-btn" onclick="alert('Edit patient: Vinay K.')">Edit</button>
-                                </div>
+                            <div class="input-group"><label>Address</label><input type="text" value="Main Road, Pune" /></div>
+                            <button class="btn-primary btn-success" style="padding:12px;"><i class="fas fa-save"></i> Save Hospital Info</button>
+                        </div>
+                        <div class="logout-btn-wrap">
+                            <button class="btn-secondary" style="color:var(--danger);border-color:rgba(211,47,47,0.15);" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                        </div>
+                    </div>
+
+                    <!-- ── NOTIFICATIONS ── -->
+                    <div class="screen" id="screen-notifications">
+                        <!-- <div class="page-title" style="text-align:center;">Notifications</div> -->
+                        <div id="notificationList">
+                            <div class="notif-item">
+                                <div class="icon"><i class="fas fa-bed"></i></div>
+                                <div class="content"><div class="title">Bed confirmed</div><div class="desc">ICU bed #03 at City General is now confirmed for you.</div><div class="time">2 min ago</div></div>
                             </div>
-                            <div class="comm-item">
-                                <div class="info"><div class="name">Raj P.</div><div class="pid">P-TDOKEK46 · Family: +91 76543 21098</div></div>
-                                <div class="actions-group">
-                                    <button class="call-btn" onclick="alert('📞 Calling family of Raj P....')"><i class="fas fa-phone"></i></button>
-                                    <button class="note-btn" onclick="openCommNote('Raj P.')"><i class="fas fa-pen"></i></button>
-                                    <button class="edit-btn" onclick="alert('Edit patient: Raj P.')">Edit</button>
-                                </div>
+                            <div class="notif-item">
+                                <div class="icon" style="color:var(--warning);"><i class="fas fa-clock"></i></div>
+                                <div class="content"><div class="title">Queue update</div><div class="desc">You're now #2 in queue at City General · ICU.</div><div class="time">12 min ago</div></div>
+                            </div>
+                            <div class="notif-item">
+                                <div class="icon emergency-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                <div class="content"><div class="title">Emergency alert <span class="emergency-badge">URGENT</span></div><div class="desc">Emergency bed allocation at Metro Hospital. Please report immediately.</div><div class="time">25 min ago</div></div>
+                            </div>
+                            <div class="notif-item">
+                                <div class="icon" style="color:var(--primary);"><i class="fas fa-check-circle"></i></div>
+                                <div class="content"><div class="title">Discharge ready</div><div class="desc">Patient #P-1024 is ready for discharge. Receipt available.</div><div class="time">1 hour ago</div></div>
+                            </div>
+                            <div class="notif-item">
+                                <div class="icon" style="color:var(--danger);"><i class="fas fa-exclamation-triangle"></i></div>
+                                <div class="content"><div class="title">Fraud alert</div><div class="desc">Duplicate booking detected for patient #P-1024.</div><div class="time">2 hours ago</div></div>
                             </div>
                         </div>
                     </div>
-                    <div class="comm-note-area" id="commNoteArea">
-                        <div class="note-header">
-                            <div class="note-label"><i class="fas fa-pen"></i> Send note to <strong id="commNoteTarget">patient</strong> &amp; family</div>
-                            <button class="close-note-btn" onclick="closeCommNote()">&times;</button>
-                        </div>
-                        <div class="note-input-row">
-                            <input type="text" placeholder="Type note for patient and family..." id="commNoteInput" />
-                            <button onclick="sendCommNote()"><i class="fas fa-paper-plane"></i></button>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- ── ADMIN: BOOKINGS ── -->
-                <div class="screen" id="screen-admin-bookings">
-                    <div class="admin-bookings-title">Hospital Bookings</div>
-                    <div class="admin-bookings-subtitle">Manage all patient admissions</div>
-                    <div class="admin-search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search by patient name or ID..." id="adminBookingSearch" oninput="filterAdminBookings(this.value)" />
-                    </div>
-                    <div class="admin-filter-chips">
-                        <button class="filter-chip active" style="font-size:11px;padding:6px 14px;">All</button>
-                        <button class="filter-chip" style="font-size:11px;padding:6px 14px;">Pending</button>
-                        <button class="filter-chip" style="font-size:11px;padding:6px 14px;">Confirmed</button>
-                        <button class="filter-chip" style="font-size:11px;padding:6px 14px;">Admitted</button>
-                        <button class="filter-chip" style="font-size:11px;padding:6px 14px;">Discharged</button>
-                    </div>
-                    <div id="adminBookingList"></div>
-                </div>
-
-                <!-- ── ADMIN: TRANSFERS ── -->
-                <div class="screen" id="screen-admin-transfers">
-                    <div class="page-title">Transfers</div>
-                    <div class="page-subtitle">Internal &amp; external hospital transfers</div>
-                    <div style="font-weight:600;font-size:14px;color:var(--text-secondary);margin-bottom:6px;">Outgoing</div>
-                    <div class="transfer-card">
-                        <div class="from-to">City General <i class="fas fa-arrow-right"></i> St. Mary's</div>
-                        <div class="meta">Patient: Vinit Kothari · ICU · 2 hours ago</div>
-                        <div class="status"><span class="badge-status pending">In Progress</span></div>
-                    </div>
-                    <div style="font-weight:600;font-size:14px;color:var(--text-secondary);margin:12px 0 6px;">Incoming</div>
-                    <div class="transfer-card">
-                        <div class="from-to">Metro <i class="fas fa-arrow-right"></i> City General</div>
-                        <div class="meta">Patient: Vinay K. · Emergency · 5 hours ago</div>
-                        <div class="status"><span class="badge-status completed">Completed</span></div>
-                    </div>
-                    <div class="transfer-card">
-                        <div class="from-to">Apollo <i class="fas fa-arrow-right"></i> City General</div>
-                        <div class="meta">Patient: Raj P. · General · 1 day ago</div>
-                        <div class="status"><span class="badge-status completed">Completed</span></div>
-                    </div>
-                    <button class="btn-secondary mt-12" style="border-color:rgba(46,125,50,0.15);"><i class="fas fa-plus"></i> Request New Transfer</button>
-                </div>
-
-                <!-- ── ADMIN: FRAUD ── -->
-                <div class="screen" id="screen-admin-fraud">
-                    <div class="page-title">AI Fraud Detection</div>
-                    <div class="input-group" style="margin-top:8px;">
-                        <label>Analyze a specific patient by User ID</label>
-                        <input type="text" placeholder="Paste User ID or Patient ID..." />
-                    </div>
-                    <button class="btn-secondary" style="margin-bottom:14px;padding:12px;"><i class="fas fa-search"></i> Analyze</button>
-                    <div style="font-size:14px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">All Patients — Risk Overview</div>
-                    <div id="fraudList"></div>
-                </div>
-
-                <!-- ── ADMIN: SETTINGS ── -->
-                <div class="screen" id="screen-admin-settings">
-                    <div class="page-title">Settings</div>
-                    <div class="settings-group">
-                        <!-- <div class="settings-title">Hospital Information</div> -->
-                        <div class="settings-desc">Update your hospital's public details</div>
-                        <div class="input-group"><label>Hospital Name</label><input type="text" value="Tata Memorial" /></div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                            <div class="input-group"><label>City</label><input type="text" value="Pune" /></div>
-                            <div class="input-group"><label>Phone (10 digits)</label><input type="text" value="912345678" /></div>
-                        </div>
-                        <div class="input-group"><label>Address</label><input type="text" value="Main Road, Pune" /></div>
-                        <button class="btn-primary btn-success" style="padding:12px;"><i class="fas fa-save"></i> Save Hospital Info</button>
-                    </div>
-                    <div class="logout-btn-wrap">
-                        <button class="btn-secondary" style="color:var(--danger);border-color:rgba(211,47,47,0.15);" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                    </div>
-                </div>
-
-                <!-- ── NOTIFICATIONS ── -->
-                <div class="screen" id="screen-notifications">
-                    <!-- <div class="page-title" style="text-align:center;">Notifications</div> -->
-                    <div id="notificationList">
-                        <div class="notif-item">
-                            <div class="icon"><i class="fas fa-bed"></i></div>
-                            <div class="content"><div class="title">Bed confirmed</div><div class="desc">ICU bed #03 at City General is now confirmed for you.</div><div class="time">2 min ago</div></div>
-                        </div>
-                        <div class="notif-item">
-                            <div class="icon" style="color:var(--warning);"><i class="fas fa-clock"></i></div>
-                            <div class="content"><div class="title">Queue update</div><div class="desc">You're now #2 in queue at City General · ICU.</div><div class="time">12 min ago</div></div>
-                        </div>
-                        <div class="notif-item">
-                            <div class="icon emergency-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                            <div class="content"><div class="title">Emergency alert <span class="emergency-badge">URGENT</span></div><div class="desc">Emergency bed allocation at Metro Hospital. Please report immediately.</div><div class="time">25 min ago</div></div>
-                        </div>
-                        <div class="notif-item">
-                            <div class="icon" style="color:var(--primary);"><i class="fas fa-check-circle"></i></div>
-                            <div class="content"><div class="title">Discharge ready</div><div class="desc">Patient #P-1024 is ready for discharge. Receipt available.</div><div class="time">1 hour ago</div></div>
-                        </div>
-                        <div class="notif-item">
-                            <div class="icon" style="color:var(--danger);"><i class="fas fa-exclamation-triangle"></i></div>
-                            <div class="content"><div class="title">Fraud alert</div><div class="desc">Duplicate booking detected for patient #P-1024.</div><div class="time">2 hours ago</div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ── RECEIPT OVERLAY ── -->
-                <div class="bed-detail-popup" id="receiptOverlay">
-                    <div class="popup-content" style="position:relative;">
-                        <button class="close-btn" onclick="closeReceipt()">&times;</button>
-                        <div class="receipt-preview">
-                            <div class="header"><h3><i class="fas fa-file-medical-alt"></i> MediTrack</h3><div style="font-size:12px;color:var(--text-muted);">Discharge Receipt</div></div>
-                            <div class="row"><span class="label">Patient</span><span class="value" id="receiptPatient">Vinay Kothari</span></div>
-                            <div class="row"><span class="label">Patient ID</span><span class="value" id="receiptPid">PAT-2026-0717</span></div>
-                            <div class="row"><span class="label">Hospital</span><span class="value" id="receiptHospital">City General</span></div>
-                            <div class="row"><span class="label">Bed</span><span class="value" id="receiptBed">ICU-03 · Room A</span></div>
-                            <div class="row"><span class="label">Admitted</span><span class="value" id="receiptAdmitted">17 Jul 2026, 09:30</span></div>
-                            <div class="row"><span class="label">Discharged</span><span class="value" id="receiptDischarged">17 Jul 2026, 14:15</span></div>
-                            <div class="row"><span class="label">Duration</span><span class="value" id="receiptDuration">4h 45m</span></div>
-                            <div class="row"><span class="label">Status</span><span class="value" style="color:var(--primary);">Completed</span></div>
-                            <div class="barcode">
-                                <div class="qr-pattern">
-                                    <span>█</span><span>▀</span><span>█</span><span>▀</span><span>█</span><span>▄</span><span>█</span><span>▀</span>
-                                    <span>▄</span><span>█</span><span>▀</span><span>█</span><span>▄</span><span>▀</span><span>█</span><span>▄</span>
-                                    <span>█</span><span>▀</span><span>▄</span><span>█</span><span>▀</span><span>▄</span><span>█</span><span>▀</span>
-                                    <span>█</span><span>▄</span><span>▀</span><span>█</span><span>▄</span><span>▀</span><span>█</span><span>▄</span>
+                    <!-- ── RECEIPT OVERLAY ── -->
+                    <div class="bed-detail-popup" id="receiptOverlay">
+                        <div class="popup-content" style="position:relative;">
+                            <button class="close-btn" onclick="closeReceipt()">&times;</button>
+                            <div class="receipt-preview">
+                                <div class="header"><h3><i class="fas fa-file-medical-alt"></i> MediTrack</h3><div style="font-size:12px;color:var(--text-muted);">Discharge Receipt</div></div>
+                                <div class="row"><span class="label">Patient</span><span class="value" id="receiptPatient">Vinay Kothari</span></div>
+                                <div class="row"><span class="label">Patient ID</span><span class="value" id="receiptPid">PAT-2026-0717</span></div>
+                                <div class="row"><span class="label">Hospital</span><span class="value" id="receiptHospital">City General</span></div>
+                                <div class="row"><span class="label">Bed</span><span class="value" id="receiptBed">ICU-03 · Room A</span></div>
+                                <div class="row"><span class="label">Admitted</span><span class="value" id="receiptAdmitted">17 Jul 2026, 09:30</span></div>
+                                <div class="row"><span class="label">Discharged</span><span class="value" id="receiptDischarged">17 Jul 2026, 14:15</span></div>
+                                <div class="row"><span class="label">Duration</span><span class="value" id="receiptDuration">4h 45m</span></div>
+                                <div class="row"><span class="label">Status</span><span class="value" style="color:var(--primary);">Completed</span></div>
+                                <div class="barcode">
+                                    <div class="qr-pattern">
+                                        <span>█</span><span>▀</span><span>█</span><span>▀</span><span>█</span><span>▄</span><span>█</span><span>▀</span>
+                                        <span>▄</span><span>█</span><span>▀</span><span>█</span><span>▄</span><span>▀</span><span>█</span><span>▄</span>
+                                        <span>█</span><span>▀</span><span>▄</span><span>█</span><span>▀</span><span>▄</span><span>█</span><span>▀</span>
+                                        <span>█</span><span>▄</span><span>▀</span><span>█</span><span>▄</span><span>▀</span><span>█</span><span>▄</span>
+                                    </div>
                                 </div>
+                                <div style="text-align:center;font-size:10px;color:var(--text-muted);letter-spacing:1px;">#R-2026-0717-001</div>
+                                <div class="footer">Thank you for choosing MediTrack. Stay healthy!</div>
                             </div>
-                            <div style="text-align:center;font-size:10px;color:var(--text-muted);letter-spacing:1px;">#R-2026-0717-001</div>
-                            <div class="footer">Thank you for choosing MediTrack. Stay healthy!</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- ── BED DETAIL POPUP ── -->
-                <div class="bed-detail-popup" id="bedDetailPopup">
-                    <div class="popup-content">
-                        <button class="close-btn" onclick="closeBedDetail()">&times;</button>
-                        <div class="title" id="bedDetailTitle">Bed ICU-03</div>
-                        <div id="bedDetailContent">
-                            <div class="detail-row"><span class="lbl">Patient</span><span class="val" id="bdPatient">Vinay Kothari</span></div>
-                            <div class="detail-row"><span class="lbl">Age</span><span class="val" id="bdAge">45</span></div>
-                            <div class="detail-row"><span class="lbl">Gender</span><span class="val" id="bdGender">Male</span></div>
-                            <div class="detail-row"><span class="lbl">Admitted</span><span class="val" id="bdAdmitted">17 Jul 2026, 09:30</span></div>
-                            <div class="detail-row"><span class="lbl">Condition</span><span class="val" id="bdCondition">Chest pain, critical</span></div>
-                            <div class="detail-row"><span class="lbl">Attending</span><span class="val" id="bdDoctor">Dr. Sharma</span></div>
-                            <div style="margin-top:12px;"><span class="status-badge badge-status active" id="bdStatusBadge">Occupied</span></div>
+                    <!-- ── BED DETAIL POPUP ── -->
+                    <div class="bed-detail-popup" id="bedDetailPopup">
+                        <div class="popup-content">
+                            <button class="close-btn" onclick="closeBedDetail()">&times;</button>
+                            <div class="title" id="bedDetailTitle">Bed ICU-03</div>
+                            <div id="bedDetailContent">
+                                <div class="detail-row"><span class="lbl">Patient</span><span class="val" id="bdPatient">Vinay Kothari</span></div>
+                                <div class="detail-row"><span class="lbl">Age</span><span class="val" id="bdAge">45</span></div>
+                                <div class="detail-row"><span class="lbl">Gender</span><span class="val" id="bdGender">Male</span></div>
+                                <div class="detail-row"><span class="lbl">Admitted</span><span class="val" id="bdAdmitted">17 Jul 2026, 09:30</span></div>
+                                <div class="detail-row"><span class="lbl">Condition</span><span class="val" id="bdCondition">Chest pain, critical</span></div>
+                                <div class="detail-row"><span class="lbl">Attending</span><span class="val" id="bdDoctor">Dr. Sharma</span></div>
+                                <div style="margin-top:12px;"><span class="status-badge badge-status active" id="bdStatusBadge">Occupied</span></div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- ── PASSWORD PROMPT FOR HIDDEN BEDS ── -->
-                <div class="password-prompt-overlay" id="passwordPrompt">
-                    <div class="prompt-content">
-                        <div class="title">🔒 Reserve Bed Access</div>
-                        <div class="sub">Enter admin password to book this hidden/reserve bed</div>
-                        <input type="password" id="hiddenBedPassword" placeholder="Enter password..." />
-                        <div class="btn-row">
-                            <button class="confirm-btn" onclick="confirmHiddenBed()">Enter</button>
-                            <button class="cancel-btn" onclick="cancelHiddenBed()">Cancel</button>
+                    <!-- ── PASSWORD PROMPT FOR HIDDEN BEDS ── -->
+                    <div class="password-prompt-overlay" id="passwordPrompt">
+                        <div class="prompt-content">
+                            <div class="title">🔒 Reserve Bed Access</div>
+                            <div class="sub">Enter admin password to book this hidden/reserve bed</div>
+                            <input type="password" id="hiddenBedPassword" placeholder="Enter password..." />
+                            <div class="btn-row">
+                                <button class="confirm-btn" onclick="confirmHiddenBed()">Enter</button>
+                                <button class="cancel-btn" onclick="cancelHiddenBed()">Cancel</button>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px;">Default: admin123</div>
                         </div>
-                        <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px;">Default: admin123</div>
                     </div>
+
+                </div><!-- /screen-container -->
+
+                <!-- ═══ PATIENT TAB BAR ═══ -->
+                <div class="tab-bar" id="tabBar">
+                    <button class="tab-item active" data-tab="hospitals" onclick="switchTab('hospitals')"><i class="fas fa-compass"></i><span>Explore</span></button>
+                    <button class="tab-item" data-tab="bookings" onclick="switchTab('bookings')"><i class="fas fa-suitcase"></i><span>Bookings</span><span class="tab-badge">1</span></button>
+                    <button class="tab-item" data-tab="history" onclick="switchTab('history')"><i class="fas fa-star"></i><span>Score</span></button>
+                    <button class="tab-item" data-tab="profile" onclick="switchTab('profile')"><i class="fas fa-user"></i><span>Profile</span></button>
                 </div>
 
-            </div><!-- /screen-container -->
+                <!-- ═══ ADMIN TAB BAR ═══ -->
+                <div class="tab-bar" id="adminTabBar" style="display:none;background:rgba(255,255,255,0.92);">
+                    <button class="tab-item active" data-tab="admin-dash" onclick="switchAdminTab('dash')"><i class="fas fa-chart-pie"></i><span>Overview</span></button>
+                    <button class="tab-item" data-tab="admin-beds" onclick="switchAdminTab('beds')"><i class="fas fa-bed"></i><span>Beds</span></button>
+                    <button class="tab-item" data-tab="admin-bookings" onclick="switchAdminTab('bookings')"><i class="fas fa-calendar-check"></i><span>Bookings</span></button>
+                    <button class="tab-item" data-tab="admin-settings" onclick="switchAdminTab('settings')"><i class="fas fa-cog"></i><span>Settings</span></button>
+                </div>
 
-            <!-- ═══ PATIENT TAB BAR ═══ -->
-            <div class="tab-bar" id="tabBar">
-                <button class="tab-item active" data-tab="hospitals" onclick="switchTab('hospitals')"><i class="fas fa-compass"></i><span>Explore</span></button>
-                <button class="tab-item" data-tab="bookings" onclick="switchTab('bookings')"><i class="fas fa-suitcase"></i><span>Bookings</span><span class="tab-badge">1</span></button>
-                <button class="tab-item" data-tab="history" onclick="switchTab('history')"><i class="fas fa-star"></i><span>Score</span></button>
-                <button class="tab-item" data-tab="profile" onclick="switchTab('profile')"><i class="fas fa-user"></i><span>Profile</span></button>
-            </div>
+                <!-- ═══ CHATBOT ═══ -->
+                <button class="chatbot-toggle" id="chatbotToggle" onclick="toggleChatbot()"><i class="fas fa-comment-medical"></i></button>
+                <div class="chatbot-window" id="chatbotWindow">
+                    <div class="header"><span><i class="fas fa-robot" style="margin-right:6px;"></i> MediBot</span><button class="close" onclick="toggleChatbot()">&times;</button></div>
+                    <div id="chatMessages"><div class="message bot">👋 Hello! I'm MediBot. How can I help you today?</div></div>
+                    <div class="input-row"><input type="text" id="chatInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendChat()" /><button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button></div>
+                </div>
 
-            <!-- ═══ ADMIN TAB BAR ═══ -->
-            <div class="tab-bar" id="adminTabBar" style="display:none;background:rgba(255,255,255,0.92);">
-                <button class="tab-item active" data-tab="admin-dash" onclick="switchAdminTab('dash')"><i class="fas fa-chart-pie"></i><span>Overview</span></button>
-                <button class="tab-item" data-tab="admin-beds" onclick="switchAdminTab('beds')"><i class="fas fa-bed"></i><span>Beds</span></button>
-                <button class="tab-item" data-tab="admin-bookings" onclick="switchAdminTab('bookings')"><i class="fas fa-calendar-check"></i><span>Bookings</span></button>
-                <button class="tab-item" data-tab="admin-settings" onclick="switchAdminTab('settings')"><i class="fas fa-cog"></i><span>Settings</span></button>
-            </div>
-
-            <!-- ═══ CHATBOT ═══ -->
-            <button class="chatbot-toggle" id="chatbotToggle" onclick="toggleChatbot()"><i class="fas fa-comment-medical"></i></button>
-            <div class="chatbot-window" id="chatbotWindow">
-                <div class="header"><span><i class="fas fa-robot" style="margin-right:6px;"></i> MediBot</span><button class="close" onclick="toggleChatbot()">&times;</button></div>
-                <div id="chatMessages"><div class="message bot">👋 Hello! I'm MediBot. How can I help you today?</div></div>
-                <div class="input-row"><input type="text" id="chatInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendChat()" /><button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button></div>
-            </div>
-
-        </div><!-- /app-container -->
-    </div><!-- /phone-frame -->
+            </div><!-- /app-container -->
+        </div><!-- /phone-frame -->
+    </div><!-- /iphone-frame -->
 
     <script>
         // ── State ──
